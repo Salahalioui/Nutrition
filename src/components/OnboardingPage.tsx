@@ -9,10 +9,12 @@ import { Label } from "./ui/label";
 import { Textarea } from "./ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 import { Navigate, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 export function OnboardingPage() {
   const { user, profile } = useAuth();
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [role, setRole] = useState<AppRole>("athlete");
   const [saving, setSaving] = useState(false);
   
@@ -39,7 +41,7 @@ export function OnboardingPage() {
       if (role === 'athlete' && finalTeamId) {
         const teamDoc = await getDoc(doc(db, 'teams', finalTeamId));
         if (!teamDoc.exists()) {
-          alert('Invalid Team ID. Please check and try again.');
+          alert(t('Invalid Team ID. Please check and try again.'));
           setSaving(false);
           return;
         }
@@ -77,20 +79,20 @@ export function OnboardingPage() {
       <Card className="border border-slate-200 shadow-xl overflow-hidden rounded-2xl">
         <div className="h-2 bg-[#064E3B]" />
         <CardHeader>
-          <CardTitle className="text-3xl font-bold text-[#064E3B]">Complete your profile</CardTitle>
-          <CardDescription className="text-slate-500">Tell us about yourself so we can tailor the experience.</CardDescription>
+          <CardTitle className="text-3xl font-bold text-[#064E3B]">{t('Complete your profile')}</CardTitle>
+          <CardDescription className="text-slate-500">{t('Tell us about yourself so we can tailor the experience.')}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
           <div className="space-y-2">
-            <Label>I am a...</Label>
+            <Label>{t('I am a...')}</Label>
             <Select value={role} onValueChange={(val) => setRole(val as AppRole)}>
               <SelectTrigger>
-                <SelectValue placeholder="Select role" />
+                <SelectValue placeholder={t('Select role')} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="athlete">Athlete / Player</SelectItem>
-                <SelectItem value="coach">Coach</SelectItem>
-                <SelectItem value="nutritionist">Nutritionist Staff</SelectItem>
+                <SelectItem value="athlete">{t('Athlete / Player')}</SelectItem>
+                <SelectItem value="coach">{t('Coach')}</SelectItem>
+                <SelectItem value="nutritionist">{t('Nutritionist Staff')}</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -98,24 +100,24 @@ export function OnboardingPage() {
           {role === 'athlete' && (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4 border-t">
               <div className="space-y-2">
-                <Label>Age</Label>
+                <Label>{t('Age')}</Label>
                 <Input type="number" placeholder="22" value={formData.age} onChange={e => setFormData({...formData, age: e.target.value})} />
               </div>
               <div className="space-y-2">
-                <Label>Weight (kg)</Label>
+                <Label>{t('Weight (kg)')}</Label>
                 <Input type="number" placeholder="75" value={formData.weight} onChange={e => setFormData({...formData, weight: e.target.value})} />
               </div>
               <div className="space-y-2">
-                <Label>Height (cm)</Label>
+                <Label>{t('Height (cm)')}</Label>
                 <Input type="number" placeholder="180" value={formData.height} onChange={e => setFormData({...formData, height: e.target.value})} />
               </div>
               <div className="space-y-2 md:col-span-3">
-                <Label>Primary Goals</Label>
-                <Input placeholder="e.g. Build muscle, increase stamina for 90min matches, trim fat" value={formData.goals} onChange={e => setFormData({...formData, goals: e.target.value})} />
+                <Label>{t('Primary Goals')}</Label>
+                <Input placeholder={t('e.g. Build muscle, increase stamina for 90min matches, trim fat')} value={formData.goals} onChange={e => setFormData({...formData, goals: e.target.value})} />
               </div>
               <div className="space-y-2 md:col-span-3">
-                <Label>Allergies / Dietary Restrictions</Label>
-                <Input placeholder="e.g. Lactose intolerant, no nuts" value={formData.allergies} onChange={e => setFormData({...formData, allergies: e.target.value})} />
+                <Label>{t('Allergies / Dietary Restrictions')}</Label>
+                <Input placeholder={t('e.g. Lactose intolerant, no nuts')} value={formData.allergies} onChange={e => setFormData({...formData, allergies: e.target.value})} />
               </div>
             </div>
           )}
@@ -123,15 +125,15 @@ export function OnboardingPage() {
           <div className="space-y-2 pt-4 border-t">
             {role === 'coach' ? (
               <>
-                <Label>Create a New Team</Label>
-                <Input placeholder="e.g. MC Alger Elite" value={formData.teamName} onChange={e => setFormData({...formData, teamName: e.target.value})} />
-                <p className="text-xs text-slate-500 mt-1">You will be able to share the Team ID with your players from the dashboard.</p>
+                <Label>{t('Create a New Team')}</Label>
+                <Input placeholder={t('e.g. MC Alger Elite')} value={formData.teamName} onChange={e => setFormData({...formData, teamName: e.target.value})} />
+                <p className="text-xs text-slate-500 mt-1">{t('You will be able to share the Team ID with your players from the dashboard.')}</p>
               </>
             ) : (
               <>
-                <Label>Team Invite Code (Optional)</Label>
-                <Input placeholder="Enter team ID if you have one" value={formData.teamInvite} onChange={e => setFormData({...formData, teamInvite: e.target.value})} />
-                <p className="text-xs text-slate-500 mt-1">Ask your coach or staff for the team invite code.</p>
+                <Label>{t('Team Invite Code (Optional)')}</Label>
+                <Input placeholder={t('Enter team ID if you have one')} value={formData.teamInvite} onChange={e => setFormData({...formData, teamInvite: e.target.value})} />
+                <p className="text-xs text-slate-500 mt-1">{t('Ask your coach or staff for the team invite code.')}</p>
               </>
             )}
           </div>
@@ -141,7 +143,7 @@ export function OnboardingPage() {
             onClick={handleSave}
             disabled={saving}
           >
-            {saving ? "Saving..." : "Start Journey"}
+            {saving ? t('Saving...') : t('Start Journey')}
           </Button>
         </CardContent>
       </Card>

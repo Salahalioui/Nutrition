@@ -9,9 +9,11 @@ import { addDoc, collection, serverTimestamp, query, orderBy, getDocs, doc, getD
 import { db } from "../lib/firebase";
 import { useAuth } from "../lib/AuthContext";
 import Markdown from 'react-markdown';
+import { useTranslation } from "react-i18next";
 
 export function AthleteDashboard() {
   const { user, profile } = useAuth();
+  const { t } = useTranslation();
   const [mealInput, setMealInput] = useState("");
   const [isLogging, setIsLogging] = useState(false);
   const [open, setOpen] = useState(false);
@@ -110,41 +112,41 @@ export function AthleteDashboard() {
       setMealInput("");
       setOpen(false);
       // Optional: Add toast notification here
-      alert(`Logged: ${summary} (${calories} kcal)`);
+      alert(`${t('Logged:')} ${summary} (${calories} kcal)`);
     } catch (e) {
       console.error(e);
-      alert("Failed to analyze meal. Please try again.");
+      alert(t("Failed to analyze meal. Please try again."));
     } finally {
       setIsLogging(false);
     }
   };
 
   const getPhaseName = () => {
-    if (nextEvent?.type === 'Match') return 'Carb-Loading Phase';
-    if (nextEvent?.type === 'Recovery') return 'Recovery Phase';
-    if (nextEvent?.type === 'Strength') return 'Hypertrophy/Strength Phase';
-    return 'Maintenance Phase';
+    if (nextEvent?.type === 'Match') return t('Carb-Loading Phase');
+    if (nextEvent?.type === 'Recovery') return t('Recovery Phase');
+    if (nextEvent?.type === 'Strength') return t('Hypertrophy/Strength Phase');
+    return t('Maintenance Phase');
   };
 
   const getPhaseDescription = () => {
-    if (nextEvent?.type === 'Match') return "Your AI plan suggests increasing carbohydrate intake by 20% today. Focus on complex carbs like Tlitli or Rechta for dinner.";
-    if (nextEvent?.type === 'Recovery') return "Focus on hydration and high-quality protein to repair muscle tissues after the recent match.";
-    if (nextEvent?.type === 'Strength') return "Protein synthesis is key today. Ensure 1.6-2.0g per kg of body weight.";
-    return "Your training intensity is moderate. Ensure adequate protein intake for recovery and keep your hydration levels optimal.";
+    if (nextEvent?.type === 'Match') return t("Your AI plan suggests increasing carbohydrate intake by 20% today. Focus on complex carbs like Tlitli or Rechta for dinner.");
+    if (nextEvent?.type === 'Recovery') return t("Focus on hydration and high-quality protein to repair muscle tissues after the recent match.");
+    if (nextEvent?.type === 'Strength') return t("Protein synthesis is key today. Ensure 1.6-2.0g per kg of body weight.");
+    return t("Your training intensity is moderate. Ensure adequate protein intake for recovery and keep your hydration levels optimal.");
   };
 
   return (
     <div className="space-y-6">
       {/* Top Banner Card */}
-      <Card className="bg-[#064E3B] text-white border-none rounded-2xl overflow-hidden relative shadow-lg">
-        <div className="absolute right-0 top-0 opacity-10">
-          <Activity className="w-64 h-64 -mr-16 -mt-16" />
+      <Card className="bg-[#064E3B] text-white border-none rounded-2xl overflow-hidden relative shadow-lg rtl:text-right">
+        <div className="absolute ltr:right-0 rtl:left-0 top-0 opacity-10">
+          <Activity className="w-64 h-64 ltr:-mr-16 rtl:-ml-16 -mt-16" />
         </div>
         <CardContent className="p-8 relative z-10">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <div>
               <p className="text-[#F59E0B] font-semibold text-xs tracking-widest uppercase mb-1">
-                {nextEvent ? `Next Event: ${nextEvent.type} on ${nextEvent.date}` : "No Upcoming Events"}
+                {nextEvent ? `${t('Next Event:')} ${t(nextEvent.type)} ${t('on')} ${nextEvent.date}` : t("No Upcoming Events")}
               </p>
               <h2 className="text-3xl font-bold">
                 {getPhaseName()}
@@ -157,15 +159,15 @@ export function AthleteDashboard() {
         </CardContent>
       </Card>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 rtl:text-right">
         {/* Plan Section */}
         <div className="lg:col-span-2 space-y-6">
           <div className="flex items-center justify-between">
-            <h3 className="text-xl font-bold text-slate-800">Your AI Nutrition Plan (Tomorrow)</h3>
+            <h3 className="text-xl font-bold text-slate-800">{t('Your AI Nutrition Plan (Tomorrow)')}</h3>
             {mealPlan && (
               <span className={`text-[10px] px-3 py-1 rounded-full font-black uppercase tracking-widest flex items-center ${mealPlan.status === 'Approved' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}`}>
-                {mealPlan.status === 'Approved' ? <Bot className="h-3 w-3 mr-1" /> : <Loader2 className="h-3 w-3 mr-1 animate-spin" />} 
-                {mealPlan.status === 'Approved' ? 'Approved by Nutritionist' : 'Draft Pending Review'}
+                {mealPlan.status === 'Approved' ? <Bot className="h-3 w-3 ltr:mr-1 rtl:ml-1" /> : <Loader2 className="h-3 w-3 ltr:mr-1 rtl:ml-1 animate-spin" />} 
+                {mealPlan.status === 'Approved' ? t('Approved by Nutritionist') : t('Draft Pending Review')}
               </span>
             )}
           </div>
@@ -177,14 +179,14 @@ export function AthleteDashboard() {
                   <Loader2 className="w-8 h-8 animate-spin text-[#064E3B]" />
                 </div>
               ) : mealPlan ? (
-                <div className="prose prose-slate max-w-none prose-h2:text-lg prose-h2:font-bold prose-h2:text-[#064E3B] prose-h2:mt-4 prose-h2:mb-2 prose-ul:my-2 prose-li:my-0 text-sm">
+                <div className={`prose prose-slate max-w-none prose-h2:text-lg prose-h2:font-bold prose-h2:text-[#064E3B] prose-h2:mt-4 prose-h2:mb-2 prose-ul:my-2 prose-li:my-0 text-sm ${t('dir') === 'rtl' ? 'rtl-markdown' : ''}`}>
                   <Markdown>{mealPlan.content}</Markdown>
                 </div>
               ) : (
                 <div className="flex flex-col items-center justify-center text-center text-slate-500 py-16">
                   <FileText className="w-16 h-16 opacity-20 mb-4" />
-                  <p className="text-lg font-medium text-slate-700">No Plan Ready</p>
-                  <p className="text-sm mt-1 max-w-sm">Your nutritionist has not yet published your AI-powered meal plan for tomorrow. Check back later.</p>
+                  <p className="text-lg font-medium text-slate-700">{t('No Plan Ready')}</p>
+                  <p className="text-sm mt-1 max-w-sm">{t('Your nutritionist has not yet published your AI-powered meal plan for tomorrow. Check back later.')}</p>
                 </div>
               )}
             </CardContent>
@@ -195,44 +197,44 @@ export function AthleteDashboard() {
         <div className="space-y-6">
           <Card className="rounded-2xl border-slate-200 shadow-sm border">
             <CardHeader className="bg-slate-50/50 border-b border-slate-100 p-4">
-              <CardTitle className="text-sm font-bold uppercase text-slate-500 tracking-wider">Daily Macros</CardTitle>
+              <CardTitle className="text-sm font-bold uppercase text-slate-500 tracking-wider text-center">{t('Daily Macros')}</CardTitle>
             </CardHeader>
             <CardContent className="p-6">
               <div className="space-y-4">
                 <div className="flex justify-between items-end">
                   <div className="space-y-1">
-                    <p className="text-xs font-bold text-slate-400 uppercase">Calories</p>
+                    <p className="text-xs font-bold text-slate-400 uppercase">{t('Calories')}</p>
                     <p className="text-3xl font-black text-[#064E3B]">{todayMacros.calories} <span className="text-sm font-bold text-slate-400">/ 2400</span></p>
                   </div>
                   <Flame className="text-[#F59E0B] h-6 w-6 mb-1" />
                 </div>
                 <div className="w-full bg-slate-100 rounded-full h-2">
-                  <div className="bg-[#F59E0B] h-2 rounded-full" style={{ width: `${Math.min((todayMacros.calories / 2400) * 100, 100)}%` }}></div>
+                  <div className="bg-[#F59E0B] h-2 rounded-full transition-all" style={{ width: `${Math.min((todayMacros.calories / 2400) * 100, 100)}%` }}></div>
                 </div>
                 
                 <div className="grid grid-cols-3 gap-2 pt-4">
-                  <MacroMini label="Protein" current={todayMacros.protein} target={140} color="bg-blue-500" />
-                  <MacroMini label="Carbs" current={todayMacros.carbs} target={300} color="bg-green-500" />
-                  <MacroMini label="Fats" current={todayMacros.fats} target={60} color="bg-yellow-500" />
+                  <MacroMini label={t('Protein')} current={todayMacros.protein} target={140} color="bg-blue-500" />
+                  <MacroMini label={t('Carbs')} current={todayMacros.carbs} target={300} color="bg-green-500" />
+                  <MacroMini label={t('Fats')} current={todayMacros.fats} target={60} color="bg-yellow-500" />
                 </div>
               </div>
             </CardContent>
           </Card>
 
           <Dialog open={open} onOpenChange={setOpen}>
-            <DialogTrigger render={<Button className="w-full py-6 text-sm font-bold rounded-xl bg-[#064E3B] text-white hover:bg-[#047857] shadow-lg shadow-[#064E3B]/20 transition-all uppercase tracking-wider" />}>
-              <Plus className="mr-2 h-5 w-5" /> Log a Meal with AI
+            <DialogTrigger render={<Button className="w-full py-6 text-sm font-bold flex items-center justify-center rounded-xl bg-[#064E3B] text-white hover:bg-[#047857] shadow-lg shadow-[#064E3B]/20 transition-all uppercase tracking-wider" />}>
+              <Plus className="mr-2 h-5 w-5 rtl:ml-2 rtl:mr-0" /> {t('Log a Meal with AI')}
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[425px] rounded-2xl">
+            <DialogContent className="sm:max-w-[425px] rounded-2xl rtl:text-right">
               <DialogHeader>
-                <DialogTitle className="text-[#064E3B] font-bold">Log Meal</DialogTitle>
+                <DialogTitle className="text-[#064E3B] font-bold">{t('Log Meal')}</DialogTitle>
                 <DialogDescription className="text-slate-500">
-                  Tell our AI what you ate. Be specific for better macro estimates.
+                  {t('Tell our AI what you ate. Be specific for better macro estimates.')}
                 </DialogDescription>
               </DialogHeader>
               <div className="grid gap-4 py-4">
                 <Textarea
-                  placeholder="e.g. A bowl of Loubia with a piece of Kesra and a side salad..."
+                  placeholder={t('e.g. A bowl of Loubia with a piece of Kesra and a side salad...')}
                   value={mealInput}
                   onChange={(e) => setMealInput(e.target.value)}
                   className="min-h-[100px] resize-none border-slate-200"
@@ -240,7 +242,7 @@ export function AthleteDashboard() {
               </div>
               <DialogFooter>
                 <Button onClick={handleLogMeal} disabled={isLogging} className="w-full bg-[#F59E0B] font-bold text-[#064E3B] hover:text-white hover:bg-[#D97706] rounded-xl shadow-sm">
-                  {isLogging ? "Analyzing..." : "Analyze & Log"}
+                  {isLogging ? t("Analyzing...") : t("Analyze & Log")}
                 </Button>
               </DialogFooter>
             </DialogContent>
@@ -251,28 +253,6 @@ export function AthleteDashboard() {
   );
 }
 
-function MealCard({ type, time, title, cals, p, c, f, highlight = false }: any) {
-  return (
-    <Card className={`rounded-xl overflow-hidden transition-all duration-200 border border-slate-200 shadow-sm ${highlight ? 'ring-2 ring-amber-400 bg-amber-50/30' : 'hover:border-slate-300 hover:shadow-md'}`}>
-      <CardContent className="p-0 flex flex-col sm:flex-row">
-        <div className={`p-4 sm:p-5 sm:w-1/4 grow-0 shrink-0 border-b sm:border-b-0 sm:border-r border-slate-200 flex flex-col justify-center ${highlight ? 'bg-white' : 'bg-slate-50'}`}>
-          <p className="text-[10px] font-black uppercase tracking-widest text-[#064E3B]">{type}</p>
-          <p className="text-xs text-slate-500 font-bold mt-1">{time}</p>
-        </div>
-        <div className="p-4 sm:p-5 flex-1 flex flex-col justify-center">
-          <h4 className="text-sm font-semibold text-slate-900 mb-2">{title}</h4>
-          <div className="flex flex-wrap items-center gap-4 text-xs font-bold">
-            <span className="text-emerald-600 bg-emerald-100/50 px-2 py-0.5 rounded-full">{cals} kcal</span>
-            <span className="text-slate-400 border-l pl-4 border-slate-200">Protein <strong className="text-slate-700">{p}g</strong></span>
-            <span className="text-slate-400">Carbs <strong className="text-slate-700">{c}g</strong></span>
-            <span className="text-slate-400">Fats <strong className="text-slate-700">{f}g</strong></span>
-          </div>
-        </div>
-      </CardContent>
-    </Card>
-  );
-}
-
 function MacroMini({ label, current, target, color }: any) {
   const percent = Math.min((current/target)*100, 100);
   return (
@@ -280,7 +260,7 @@ function MacroMini({ label, current, target, color }: any) {
       <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">{label}</p>
       <p className="font-black text-slate-900 mb-2">{current}g</p>
       <div className="w-full bg-slate-100 rounded-full h-1">
-        <div className={`${color} h-1 rounded-full`} style={{ width: `${percent}%` }}></div>
+        <div className={`${color} h-1 rounded-full transition-all`} style={{ width: `${percent}%` }}></div>
       </div>
     </div>
   )

@@ -6,7 +6,7 @@ const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 export async function extractMealInfo(text: string) {
   const prompt = `Analyze this Algerian meal description and estimate nutritional content: "${text}".
 Consider Algerian foods like Loubia, Kesra, Rechta, Tlitli, Deglet Nour, Lben, Chorba, Couscous, etc.
-Provide realistic estimates.`;
+Provide realistic estimates. Write the summary in Arabic (Darija/MSA).`;
 
   const response = await ai.models.generateContent({
     model: 'gemini-3-flash-preview',
@@ -20,7 +20,7 @@ Provide realistic estimates.`;
           protein: { type: Type.NUMBER, description: "Estimated protein in grams" },
           carbs: { type: Type.NUMBER, description: "Estimated carbohydrates in grams" },
           fats: { type: Type.NUMBER, description: "Estimated fats in grams" },
-          summary: { type: Type.STRING, description: "Brief description of the meal" }
+          summary: { type: Type.STRING, description: "Brief description of the meal in Arabic (Darija/MSA)" }
         },
         required: ["calories", "protein", "carbs", "fats", "summary"]
       }
@@ -41,6 +41,7 @@ export async function generateMealPlan(stats: any, events: any[], directives: st
   prompt += `
 Generate a 1-day meal plan to align with tomorrow's training load.
 Prioritize Algerian foods (e.g., Dates/Deglet Nour and Lben for pre-workout quick carbs, lean meats with Chorba/Couscous for recovery, balanced Rechta/Tlitli for carb loading).
+The meal plan MUST be written entirely in Algerian Arabic (Darija) or Modern Standard Arabic.
 Return the plan formatted with Markdown. Include Breakfast, Snack, Lunch, Pre-Workout, Post-Workout, Dinner as applicable.
 IMPORTANT: Output only the markdown string, no extra conversational text.
 `;

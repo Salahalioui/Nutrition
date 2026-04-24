@@ -4,9 +4,11 @@ import { AthleteDashboard } from "./AthleteDashboard";
 import { CoachDashboard } from "./CoachDashboard";
 import { NutritionistDashboard } from "./NutritionistDashboard";
 import { Skeleton } from "./ui/skeleton";
+import { useTranslation } from "react-i18next";
 
 export function Dashboard() {
   const { user, profile, loading } = useAuth();
+  const { t } = useTranslation();
 
   if (loading) {
     return (
@@ -26,11 +28,11 @@ export function Dashboard() {
 
   return (
     <div className="animate-in fade-in duration-300">
-      <div className="mb-8 border-b border-slate-200 pb-4">
+      <div className="mb-8 border-b border-slate-200 pb-4 rtl:text-right">
         <h1 className="text-2xl font-bold text-slate-900">
-          Welcome back, {profile.displayName.split(' ')[0]}
+          {t('Welcome back,')} {profile.displayName.split(' ')[0]}
         </h1>
-        <p className="text-xs text-slate-500 font-medium uppercase tracking-wider mt-1">Here is your customized view for {profile.role}s.</p>
+        <p className="text-xs text-slate-500 font-medium uppercase tracking-wider mt-1">{t('Here is your customized view for')} {t(profile.role)}s.</p>
       </div>
 
       {profile.role === 'athlete' && <AthleteDashboard />}

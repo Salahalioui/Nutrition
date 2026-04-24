@@ -1,0 +1,124 @@
+ 
+Access your personalized Algerian sports nutrition plan.
+Active
+Adding...
+Add Session
+Add Training Session
+Advanced AI suggesting optimized portions of Deglet Nour, Couscous, and Chorba based on your carb-loading and recovery needs.
+Age
+Age:
+AI Context
+AI Plan Review
+Allergies / Dietary Restrictions
+Analyze & Log
+Analyzing...
+Approved by Nutritionist
+Approve & Publish
+Ask AI to Revise
+Ask your coach or staff for the team invite code.
+Athlete
+Athlete / Player
+Calories
+Carb-Loading Phase
+Carbs
+Cardio
+Coach
+Coaches input macro-cycles and intensity. Your meal plan automatically adjusts to match the exact energy requirements of the day.
+Complete your profile
+Continue with Google
+Create a new event for the team calendar.
+Create a New Team
+Cultural AI Diet
+Daily Macros
+Date
+dir
+Draft Pending Review
+Dzair
+e.g. A bowl of Loubia with a piece of Kesra and a side salad...
+e.g. Build muscle, increase stamina for 90min matches, trim fat
+e.g. Lactose intolerant, no nuts
+e.g. MC Alger Elite
+Enter team ID if you have one
+Event Type
+Expert Review
+Failed to add session. Check console.
+Failed to analyze meal. Please try again.
+Fats
+Focus on hydration and high-quality protein to repair muscle tissues after the recent match.
+Fri
+Fuel Your Performance with
+Generate AI Draft
+Generate one using AI based on their upcoming training.
+Get Started
+Height (cm)
+High
+Hypertrophy/Strength Phase
+I am a...
+Intensity
+Intensity Level
+Invalid Team ID. Please check and try again.
+Log a Meal with AI
+Logged:
+Log Meal
+Low
+Maintenance Phase
+Manage macro-cycles and set training loads.
+Match
+Match (Maximum)
+Medium
+Mon
+Next Event:
+No athletes found in your team.
+No athletes have joined yet.
+No plan exists for tomorrow.
+No Plan Ready
+No Upcoming Events
+Nutrition
+Nutritionists and team staff can oversee, tweak, and approve the generated plans before they reach the players.
+Nutritionist Staff
+on
+Plan Editor Mode
+Plan generated for tomorrow based on athlete stats and upcoming training events.
+Primary Goals
+Protein
+Protein synthesis is key today. Ensure 1.6-2.0g per kg of body weight.
+Ready
+Recovery
+Recovery Phase
+Review Draft
+Reviewing:
+Review, tweak, and approve AI generated meal plans before athletes see them.
+Sat
+Save Session
+Saving...
+Select an athlete to view or generate their meal plan.
+Select role
+Share your Team ID with them.
+Sign In
+Signing in...
+Sign Out
+Start Journey
+Strength
+Sun
+T
+Team Athletes
+Team ID copied to clipboard!
+Team Invite Code (Optional)
+Team Overview
+Team Roster
+Tell our AI what you ate. Be specific for better macro estimates.
+Tell us about yourself so we can tailor the experience.
+The first AI sports nutrition platform specifically designed for the Algerian athlete, aligning your training load with culturally aware, perfectly timed meal plans.
+Thu
+Time
+Training Sync
+Tue
+Type
+Wed
+Weight:
+Weight (kg)
+Your AI Nutrition Plan (Tomorrow)
+Your AI plan suggests increasing carbohydrate intake by 20% today. Focus on complex carbs like Tlitli or Rechta for dinner.
+Your nutritionist has not yet published your AI-powered meal plan for tomorrow. Check back later.
+Your training intensity is moderate. Ensure adequate protein intake for recovery and keep your hydration levels optimal.
+You will be able to share the Team ID with your players from the dashboard.
