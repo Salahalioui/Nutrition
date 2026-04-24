@@ -1,0 +1,95 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "A user of the platform (Athlete, Coach, Nutritionist)",
+      "type": "object",
+      "properties": {
+        "email": { "type": "string" },
+        "displayName": { "type": "string" },
+        "role": { "type": "string", "enum": ["athlete", "coach", "nutritionist"] },
+        "teamId": { "type": "string" },
+        "createdAt": { "type": "string" },
+        "age": { "type": "number" },
+        "weight": { "type": "number" },
+        "height": { "type": "number" },
+        "goals": { "type": "string" },
+        "allergies": { "type": "string" }
+      },
+      "required": ["email", "role"]
+    },
+    "Team": {
+      "title": "Team",
+      "description": "A sports team",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "coachId": { "type": "string" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["name", "coachId"]
+    },
+    "TeamEvent": {
+      "title": "TeamEvent",
+      "description": "A training or match event for a team",
+      "type": "object",
+      "properties": {
+        "date": { "type": "string" },
+        "time": { "type": "string" },
+        "type": { "type": "string", "enum": ["Match", "Recovery", "Strength", "Cardio"] },
+        "intensity": { "type": "string", "enum": ["Low", "Medium", "High"] },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["date", "time", "type", "intensity"]
+    },
+    "MealPlan": {
+      "title": "MealPlan",
+      "description": "AI-generated daily meal plan",
+      "type": "object",
+      "properties": {
+        "date": { "type": "string" },
+        "status": { "type": "string", "enum": ["Draft", "Modified", "Approved"] },
+        "content": { "type": "string" },
+        "createdAt": { "type": "string" },
+        "nutritionistId": { "type": "string" }
+      },
+      "required": ["date", "status", "content"]
+    },
+    "MealLog": {
+      "title": "MealLog",
+      "description": "Athlete's logged meal",
+      "type": "object",
+      "properties": {
+        "description": { "type": "string" },
+        "calories": { "type": "number" },
+        "protein": { "type": "number" },
+        "carbs": { "type": "number" },
+        "fats": { "type": "number" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["description", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/User" },
+      "description": "User profiles"
+    },
+    "/teams/{teamId}": {
+      "schema": { "$ref": "#/entities/Team" },
+      "description": "Teams managed by coaches"
+    },
+    "/teams/{teamId}/events/{eventId}": {
+      "schema": { "$ref": "#/entities/TeamEvent" },
+      "description": "Training events for a team"
+    },
+    "/users/{userId}/mealPlans/{planId}": {
+      "schema": { "$ref": "#/entities/MealPlan" },
+      "description": "Meal plans for an athlete"
+    },
+    "/users/{userId}/mealLogs/{logId}": {
+      "schema": { "$ref": "#/entities/MealLog" },
+      "description": "Meal logs created by an athlete"
+    }
+  }
+}

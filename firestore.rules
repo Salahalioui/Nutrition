@@ -1,0 +1,46 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    function isSignedIn() { return request.auth != null; }
+    function existing() { return resource.data; }
+    function incoming() { return request.resource.data; }
+    
+    match /users/{userId} {
+      allow get: if isSignedIn();
+      // To list users safely, the user must query their own team.
+      // We pass teamId in the query.
+      allow list: if isSignedIn() && (
+        resource.data.teamId != null && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.teamId == resource.data.teamId
+        || resource.data.id == request.auth.uid
+      );
+      
+      allow create: if isSignedIn() && request.auth.uid == userId;
+      allow update: if isSignedIn() && request.auth.uid == userId;
+    }
+
+    match /teams/{teamId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn() && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'coach';
+      allow update: if isSignedIn() && existing().coachId == request.auth.uid;
+    }
+    
+    match /teams/{teamId}/events/{eventId} {
+      allow read: if isSignedIn();
+      allow write: if isSignedIn() && get(/databases/$(database)/documents/teams/$(teamId)).data.coachId == request.auth.uid;
+    }
+
+    match /users/{userId}/mealPlans/{planId} {
+      allow read: if isSignedIn() && (request.auth.uid == userId || get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'nutritionist');
+      allow write: if isSignedIn() && (request.auth.uid == userId || get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'nutritionist');
+    }
+
+    match /users/{userId}/mealLogs/{logId} {
+      allow read: if isSignedIn() && request.auth.uid == userId;
+      allow write: if isSignedIn() && request.auth.uid == userId;
+    }
+  }
+}
