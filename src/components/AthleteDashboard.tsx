@@ -18,6 +18,7 @@ export function AthleteDashboard() {
   const [nextEvent, setNextEvent] = useState<any>(null);
   const [mealPlan, setMealPlan] = useState<any>(null);
   const [loadingPlan, setLoadingPlan] = useState(true);
+  const [todayMacros, setTodayMacros] = useState({ calories: 0, protein: 0, carbs: 0, fats: 0 });
 
   useEffect(() => {
     async function fetchNextEvent() {
@@ -28,7 +29,7 @@ export function AthleteDashboard() {
           orderBy("date", "asc")
         );
         const evSnap = await getDocs(eventsQuery);
-        const events = evSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+        const events = evSnap.docs.map(d => ({ id: d.id, ...d.data() })) as any[];
         // simple logic: find first event on or after today
         const today = new Date().toISOString().split('T')[0];
         const upcoming = events.find(e => e.date >= today);
@@ -54,8 +55,29 @@ export function AthleteDashboard() {
         if (planDoc.exists()) {
           setMealPlan(planDoc.data());
         }
+
+        // Fetch today's meals to calculate current macros
+        const todayStart = new Date();
+        todayStart.setHours(0, 0, 0, 0);
+        const logsRef = collection(db, "users", user.uid, "mealLogs");
+        // For simplicity, we just fetch all and filter in JS if not indexed, 
+        // since setting up composite indexes might fail without a link
+        const snap = await getDocs(query(logsRef, orderBy("createdAt", "desc")));
+        
+        let cals = 0; let p = 0; let c = 0; let f = 0;
+        snap.docs.forEach(doc => {
+          const d = doc.data();
+          if (d.createdAt && d.createdAt.toDate() >= todayStart) {
+            cals += d.calories || 0;
+            p += d.protein || 0;
+            c += d.carbs || 0;
+            f += d.fats || 0;
+          }
+        });
+        setTodayMacros({ calories: cals, protein: p, carbs: c, fats: f });
+
       } catch (e) {
-        console.error("Failed to fetch meal plan", e);
+        console.error("Failed to fetch data", e);
       } finally {
         setLoadingPlan(false);
       }
@@ -78,6 +100,13 @@ export function AthleteDashboard() {
         createdAt: serverTimestamp(),
       });
       
+      setTodayMacros(prev => ({
+        calories: prev.calories + calories,
+        protein: prev.protein + protein,
+        carbs: prev.carbs + carbs,
+        fats: prev.fats + fats,
+      }));
+
       setMealInput("");
       setOpen(false);
       // Optional: Add toast notification here
@@ -173,18 +202,18 @@ export function AthleteDashboard() {
                 <div className="flex justify-between items-end">
                   <div className="space-y-1">
                     <p className="text-xs font-bold text-slate-400 uppercase">Calories</p>
-                    <p className="text-3xl font-black text-[#064E3B]">1,900 <span className="text-sm font-bold text-slate-400">/ 2,400</span></p>
+                    <p className="text-3xl font-black text-[#064E3B]">{todayMacros.calories} <span className="text-sm font-bold text-slate-400">/ 2400</span></p>
                   </div>
                   <Flame className="text-[#F59E0B] h-6 w-6 mb-1" />
                 </div>
                 <div className="w-full bg-slate-100 rounded-full h-2">
-                  <div className="bg-[#F59E0B] h-2 rounded-full" style={{ width: '75%' }}></div>
+                  <div className="bg-[#F59E0B] h-2 rounded-full" style={{ width: `${Math.min((todayMacros.calories / 2400) * 100, 100)}%` }}></div>
                 </div>
                 
                 <div className="grid grid-cols-3 gap-2 pt-4">
-                  <MacroMini label="Protein" current={103} target={140} color="bg-blue-500" />
-                  <MacroMini label="Carbs" current={235} target={300} color="bg-green-500" />
-                  <MacroMini label="Fats" current={39} target={60} color="bg-yellow-500" />
+                  <MacroMini label="Protein" current={todayMacros.protein} target={140} color="bg-blue-500" />
+                  <MacroMini label="Carbs" current={todayMacros.carbs} target={300} color="bg-green-500" />
+                  <MacroMini label="Fats" current={todayMacros.fats} target={60} color="bg-yellow-500" />
                 </div>
               </div>
             </CardContent>
