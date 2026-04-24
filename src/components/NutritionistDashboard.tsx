@@ -8,6 +8,7 @@ import { useAuth } from "../lib/AuthContext";
 import { collection, query, where, getDocs, doc, setDoc, getDoc, orderBy, serverTimestamp, updateDoc } from "firebase/firestore";
 import { db } from "../lib/firebase";
 import { generateMealPlan } from "../lib/gemini";
+import Markdown from 'react-markdown';
 import { useTranslation } from "react-i18next";
 
 export function NutritionistDashboard() {
@@ -210,10 +211,19 @@ export function NutritionistDashboard() {
                         <span className="text-[10px] font-bold text-white/40 uppercase tracking-widest">{t('Plan Editor Mode')}</span>
                       </div>
                       <Textarea 
-                        className={`flex-1 resize-none font-mono text-xs leading-relaxed p-4 bg-white/5 border-white/10 text-white/90 rounded-lg focus-visible:ring-1 focus-visible:ring-emerald-500 focus-visible:border-transparent placeholder:text-white/20 min-h-[300px] ${t('dir') === 'rtl' ? 'rtl-markdown' : ''}`} 
+                        className={`flex-1 resize-none font-mono text-xs leading-relaxed p-4 bg-white/5 border-white/10 text-white/90 rounded-lg focus-visible:ring-1 focus-visible:ring-emerald-500 focus-visible:border-transparent placeholder:text-white/20 min-h-[150px] ${t('dir') === 'rtl' ? 'rtl-markdown' : ''}`} 
                         value={editorContent}
                         onChange={(e) => setEditorContent(e.target.value)}
                       />
+                    </div>
+                    
+                    <div className="bg-white rounded-xl p-5 flex flex-col flex-1 border border-slate-200 mt-4 overflow-y-auto max-h-[300px]">
+                      <div className="mb-4">
+                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{t('Preview (Live)')}</span>
+                      </div>
+                      <div className={`prose prose-slate prose-headings:text-[#064E3B] max-w-none prose-h3:text-lg prose-h3:font-bold prose-h3:mt-6 prose-h3:mb-3 prose-h3:flex prose-h3:items-center prose-h3:gap-2 prose-li:marker:text-[#F59E0B] prose-ul:my-2 prose-li:my-1 text-sm ${t('dir') === 'rtl' ? 'rtl-markdown text-right marker:mr-2' : ''}`}>
+                         <Markdown>{editorContent || t('Generating...')}</Markdown>
+                      </div>
                     </div>
                     
                     <div className="mt-4 flex gap-3">

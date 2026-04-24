@@ -179,7 +179,7 @@ export function AthleteDashboard() {
                   <Loader2 className="w-8 h-8 animate-spin text-[#064E3B]" />
                 </div>
               ) : mealPlan ? (
-                <div className={`prose prose-slate max-w-none prose-h2:text-lg prose-h2:font-bold prose-h2:text-[#064E3B] prose-h2:mt-4 prose-h2:mb-2 prose-ul:my-2 prose-li:my-0 text-sm ${t('dir') === 'rtl' ? 'rtl-markdown' : ''}`}>
+                <div className={`prose prose-slate prose-headings:text-[#064E3B] max-w-none prose-h3:text-lg prose-h3:font-bold prose-h3:mt-6 prose-h3:mb-3 prose-h3:flex prose-h3:items-center prose-h3:gap-2 prose-li:marker:text-[#F59E0B] prose-ul:my-2 prose-li:my-1 text-sm ${t('dir') === 'rtl' ? 'rtl-markdown text-right marker:mr-2' : ''}`}>
                   <Markdown>{mealPlan.content}</Markdown>
                 </div>
               ) : (

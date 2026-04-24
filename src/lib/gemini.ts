@@ -42,7 +42,16 @@ export async function generateMealPlan(stats: any, events: any[], directives: st
 Generate a 1-day meal plan to align with tomorrow's training load.
 Prioritize Algerian foods (e.g., Dates/Deglet Nour and Lben for pre-workout quick carbs, lean meats with Chorba/Couscous for recovery, balanced Rechta/Tlitli for carb loading).
 The meal plan MUST be written entirely in Algerian Arabic (Darija) or Modern Standard Arabic.
-Return the plan formatted with Markdown. Include Breakfast, Snack, Lunch, Pre-Workout, Post-Workout, Dinner as applicable.
+Return the plan formatted with beautiful Markdown. Use nice Markdown headings (###), bullet points, and emojis.
+Include these sections if applicable:
+### 🍳 فطور الصباح (Breakfast)
+### 🥪 وجبة خفيفة (Snack)
+### 🍲 الغداء (Lunch)
+### ⚡ قبل التدريب (Pre-Workout)
+### 🔄 بعد التدريب (Post-Workout)
+### 🍽️ العشاء (Dinner)
+
+For each meal, use list items with exact portions and estimated macros (Calories/Protein/Carbs/Fats).
 IMPORTANT: Output only the markdown string, no extra conversational text.
 `;
 
