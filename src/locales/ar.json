@@ -125,5 +125,13 @@
   "Welcome back,": "مرحباً بعودتك،",
   "Here is your customized view for": "إليك عرضك المخصص كـ",
   "Preview (Live)": "معاينة (مباشرة)",
-  "Generating...": "جاري الإنشاء..."
+  "Generating...": "جاري الإنشاء...",
+  "Tomorrow's Plan": "خطة الغد",
+  "Plan History": "سجل الخطط",
+  "Back to History": "العودة للسجل",
+  "No History Found": "لا يوجد سجل",
+  "You do not have any past meal plans yet.": "لا تملك أي خطط وجبات سابقة بعد.",
+  "View": "عرض",
+  "Your Nutrition": "تغذيتك",
+  "Draft": "مسودة"
 }

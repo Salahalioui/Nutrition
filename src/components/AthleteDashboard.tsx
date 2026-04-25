@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Button } from "./ui/button";
-import { Bot, Plus, ArrowRight, Activity, Flame, FileText, Loader2 } from "lucide-react";
+import { Bot, Plus, Activity, Flame, FileText, Loader2, Clock, ArrowLeft } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "./ui/dialog";
 import { Textarea } from "./ui/textarea";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 import { extractMealInfo } from "../lib/gemini";
 import { addDoc, collection, serverTimestamp, query, orderBy, getDocs, doc, getDoc } from "firebase/firestore";
 import { db } from "../lib/firebase";
@@ -19,7 +20,10 @@ export function AthleteDashboard() {
   const [open, setOpen] = useState(false);
   const [nextEvent, setNextEvent] = useState<any>(null);
   const [mealPlan, setMealPlan] = useState<any>(null);
+  const [pastPlans, setPastPlans] = useState<any[]>([]);
+  const [selectedPastPlan, setSelectedPastPlan] = useState<any>(null);
   const [loadingPlan, setLoadingPlan] = useState(true);
+  const [loadingHistory, setLoadingHistory] = useState(false);
   const [todayMacros, setTodayMacros] = useState({ calories: 0, protein: 0, carbs: 0, fats: 0 });
 
   useEffect(() => {
@@ -57,6 +61,16 @@ export function AthleteDashboard() {
         if (planDoc.exists()) {
           setMealPlan(planDoc.data());
         }
+
+        // Fetch history as well
+        const historySnap = await getDocs(query(
+          collection(db, `users/${user.uid}/mealPlans`),
+          orderBy("date", "desc")
+        ));
+        
+        const hPlans = historySnap.docs.map(d => ({ id: d.id, ...d.data() }));
+        // Filter out tomorrow's plan
+        setPastPlans(hPlans.filter(p => (p as any).date < dateStr));
 
         // Fetch today's meals to calculate current macros
         const todayStart = new Date();
@@ -162,35 +176,98 @@ export function AthleteDashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 rtl:text-right">
         {/* Plan Section */}
         <div className="lg:col-span-2 space-y-6">
-          <div className="flex items-center justify-between">
-            <h3 className="text-xl font-bold text-slate-800">{t('Your AI Nutrition Plan (Tomorrow)')}</h3>
-            {mealPlan && (
-              <span className={`text-[10px] px-3 py-1 rounded-full font-black uppercase tracking-widest flex items-center ${mealPlan.status === 'Approved' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}`}>
-                {mealPlan.status === 'Approved' ? <Bot className="h-3 w-3 ltr:mr-1 rtl:ml-1" /> : <Loader2 className="h-3 w-3 ltr:mr-1 rtl:ml-1 animate-spin" />} 
-                {mealPlan.status === 'Approved' ? t('Approved by Nutritionist') : t('Draft Pending Review')}
-              </span>
-            )}
-          </div>
+          <Tabs defaultValue="tomorrow" className="w-full">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-xl font-bold text-slate-800 hidden sm:block">{t('Your Nutrition')}</h3>
+              <TabsList className="bg-slate-100 p-1">
+                <TabsTrigger value="tomorrow" className="rounded-lg text-xs font-bold uppercase tracking-wider">{t("Tomorrow's Plan")}</TabsTrigger>
+                <TabsTrigger value="history" className="rounded-lg text-xs font-bold uppercase tracking-wider">{t("Plan History")}</TabsTrigger>
+              </TabsList>
+            </div>
 
-          <Card className="rounded-2xl border-slate-200 shadow-sm border overflow-hidden min-h-[400px]">
-            <CardContent className="p-6">
-              {loadingPlan ? (
-                <div className="flex justify-center items-center h-full min-h-[200px]">
-                  <Loader2 className="w-8 h-8 animate-spin text-[#064E3B]" />
-                </div>
-              ) : mealPlan ? (
-                <div className={`prose prose-slate prose-headings:text-[#064E3B] max-w-none prose-h3:text-lg prose-h3:font-bold prose-h3:mt-6 prose-h3:mb-3 prose-h3:flex prose-h3:items-center prose-h3:gap-2 prose-li:marker:text-[#F59E0B] prose-ul:my-2 prose-li:my-1 text-sm ${t('dir') === 'rtl' ? 'rtl-markdown text-right marker:mr-2' : ''}`}>
-                  <Markdown>{mealPlan.content}</Markdown>
-                </div>
-              ) : (
-                <div className="flex flex-col items-center justify-center text-center text-slate-500 py-16">
-                  <FileText className="w-16 h-16 opacity-20 mb-4" />
-                  <p className="text-lg font-medium text-slate-700">{t('No Plan Ready')}</p>
-                  <p className="text-sm mt-1 max-w-sm">{t('Your nutritionist has not yet published your AI-powered meal plan for tomorrow. Check back later.')}</p>
-                </div>
-              )}
-            </CardContent>
-          </Card>
+            <TabsContent value="tomorrow" className="mt-0 outline-none">
+              <div className="flex items-center justify-end mb-4">
+                {mealPlan && (
+                  <span className={`text-[10px] px-3 py-1 rounded-full font-black uppercase tracking-widest flex items-center ${mealPlan.status === 'Approved' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}`}>
+                    {mealPlan.status === 'Approved' ? <Bot className="h-3 w-3 ltr:mr-1 rtl:ml-1" /> : <Loader2 className="h-3 w-3 ltr:mr-1 rtl:ml-1 animate-spin" />} 
+                    {mealPlan.status === 'Approved' ? t('Approved by Nutritionist') : t('Draft Pending Review')}
+                  </span>
+                )}
+              </div>
+
+              <Card className="rounded-2xl border-slate-200 shadow-sm border overflow-hidden min-h-[400px]">
+                <CardContent className="p-6">
+                  {loadingPlan ? (
+                    <div className="flex justify-center items-center h-full min-h-[200px]">
+                      <Loader2 className="w-8 h-8 animate-spin text-[#064E3B]" />
+                    </div>
+                  ) : mealPlan ? (
+                    <div className={`prose prose-slate prose-headings:text-[#064E3B] max-w-none prose-h3:text-lg prose-h3:font-bold prose-h3:mt-6 prose-h3:mb-3 prose-h3:flex prose-h3:items-center prose-h3:gap-2 prose-li:marker:text-[#F59E0B] prose-ul:my-2 prose-li:my-1 text-sm ${t('dir') === 'rtl' ? 'rtl-markdown text-right marker:mr-2' : ''}`}>
+                      <Markdown>{mealPlan.content}</Markdown>
+                    </div>
+                  ) : (
+                    <div className="flex flex-col items-center justify-center text-center text-slate-500 py-16">
+                      <FileText className="w-16 h-16 opacity-20 mb-4" />
+                      <p className="text-lg font-medium text-slate-700">{t('No Plan Ready')}</p>
+                      <p className="text-sm mt-1 max-w-sm">{t('Your nutritionist has not yet published your AI-powered meal plan for tomorrow. Check back later.')}</p>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="history" className="mt-0 outline-none">
+              <Card className="rounded-2xl border-slate-200 shadow-sm border overflow-hidden min-h-[400px]">
+                <CardContent className="p-6">
+                  {loadingPlan ? (
+                    <div className="flex justify-center items-center h-full min-h-[200px]">
+                      <Loader2 className="w-8 h-8 animate-spin text-[#064E3B]" />
+                    </div>
+                  ) : selectedPastPlan ? (
+                    <div className="space-y-4">
+                      <Button variant="ghost" onClick={() => setSelectedPastPlan(null)} className="mb-2 -ml-3 text-slate-500 hover:text-slate-900">
+                        <ArrowLeft className="w-4 h-4 mr-2 rtl:ml-2 rtl:mr-0 rtl:rotate-180" /> {t('Back to History')}
+                      </Button>
+                      <div className="flex justify-between items-center mb-4 pb-4 border-b border-slate-100">
+                        <h4 className="text-lg font-bold text-slate-900">{selectedPastPlan.date}</h4>
+                        <span className={`text-[10px] px-3 py-1 rounded-full font-black uppercase tracking-widest ${selectedPastPlan.status === 'Approved' ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-100 text-slate-600'}`}>
+                          {t(selectedPastPlan.status || 'Draft')}
+                        </span>
+                      </div>
+                      <div className={`prose prose-slate prose-headings:text-[#064E3B] max-w-none prose-h3:text-lg prose-h3:font-bold prose-h3:mt-4 prose-h3:mb-2 prose-h3:flex prose-h3:items-center prose-h3:gap-2 prose-li:marker:text-[#F59E0B] prose-ul:my-2 prose-li:my-1 text-sm ${t('dir') === 'rtl' ? 'rtl-markdown text-right marker:mr-2' : ''}`}>
+                        <Markdown>{selectedPastPlan.content}</Markdown>
+                      </div>
+                    </div>
+                  ) : pastPlans.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center text-center text-slate-500 py-16">
+                      <Clock className="w-16 h-16 opacity-20 mb-4" />
+                      <p className="text-lg font-medium text-slate-700">{t('No History Found')}</p>
+                      <p className="text-sm mt-1 max-w-sm">{t('You do not have any past meal plans yet.')}</p>
+                    </div>
+                  ) : (
+                    <div className="grid gap-3">
+                      {pastPlans.map(plan => (
+                        <div key={plan.id} onClick={() => setSelectedPastPlan(plan)} className="flex items-center justify-between p-4 rounded-xl border border-slate-200 hover:border-[#064E3B]/30 hover:bg-emerald-50/50 transition-colors cursor-pointer group">
+                          <div className="flex items-center gap-4">
+                            <div className="bg-slate-100 group-hover:bg-emerald-100 p-3 rounded-lg text-slate-500 group-hover:text-[#064E3B] transition-colors">
+                              <FileText className="w-5 h-5" />
+                            </div>
+                            <div>
+                              <p className="font-bold text-slate-900">{plan.date}</p>
+                              <p className="text-xs text-slate-500 uppercase font-bold tracking-wider mt-0.5">{t(plan.status || 'Draft')}</p>
+                            </div>
+                          </div>
+                          <Button variant="ghost" className="opacity-0 group-hover:opacity-100 text-[#064E3B]">
+                            {t('View')}
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </TabsContent>
+          </Tabs>
         </div>
 
         {/* Sidebar / Quick Log */}
